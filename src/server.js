@@ -3,6 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const i18n = require('i18n');
 const path = require('path');
+const db = require('./models');
 
 dotenv.config();
 const app = express();
@@ -20,14 +21,19 @@ app.use(express.json());
 app.use(i18n.init);
 
 const authRoutes = require('./routes/auth.routes');
-app.use('/api/auth', authRoutes);
 const userRoutes = require('./routes/user.routes');
+const projectRoutes = require('./routes/project.routes');
+
+app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/projects', projectRoutes);
 
 app.get('/', (req, res) => {
   res.send(res.__('Bem-vindo ao backend do Project.AI!'));
 });
 
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+db.sequelize.sync().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
+  });
 });
